@@ -1,0 +1,12 @@
+function b_mat = get_nonsta_var(n, m, lambda_inv, theta_samples)
+
+mu = pi/(m+1)*(1:m);
+lambda = pi/(m+1)/lambda_inv;
+b_mat = zeros(n, m+1);
+b_mat(:, 1) = 1;
+for i = 2:m+1
+    % stretching
+    b_mat(:, i) = exp(-(theta_samples*4-mu(i-1)).^2/2/lambda^2);
+end
+
+end

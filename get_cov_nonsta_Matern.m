@@ -1,4 +1,4 @@
-function cov_mat = get_cov(beta, r, b_mat)
+function cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)
 
 % number of basis functions
 m = size(b_mat, 2)-1;

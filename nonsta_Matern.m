@@ -6,6 +6,6 @@ else
     value = 1;
 end
 
-value = value*std_s*std_t;
+value = std_s*std_t*value;
 
 end
