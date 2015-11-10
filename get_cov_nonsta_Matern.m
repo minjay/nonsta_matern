@@ -5,7 +5,7 @@ m = size(b_mat, 2)-1;
 eta = beta(1:m+1);
 nu = beta(m+2);
 a = beta(m+3);
-std_vec = exp(b_mat*eta);
+std_vec = exp(b_mat*reshape(eta, m+1, 1));
 n = length(std_vec);
 
 cov_mat = zeros(n);
