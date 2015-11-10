@@ -4,7 +4,7 @@ n = length(samples);
 beta = beta_all(1:end-1);
 tau = beta_all(end);
 
-cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+eye(n)*tau^2;
+cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(n);
 
 f_value = ecmnobj(reshape(samples, 1, n), zeros(n, 1), cov_mat);
 
