@@ -1,6 +1,18 @@
 load('data_regr.mat')
 
-% beta_hat = [3.1530, 5.6248, -2.9758, 4.3551, -0.0394, 2.7891, 6.0510, 10.5671];
+rng(1)
+
+% sampling
+n = 1e3;
+[pot_samples, theta_samples, phi_samples, index] = sampling_data(resid,...
+    theta, phi, n, 0);
+
+% non-stationary variance funcion
+m = 4;
+lambda_inv = 1/1.25;
+b_mat = get_nonsta_var(m, lambda_inv, theta_samples);
+
+beta_hat = [3.923432 2.04541 0.396874 1.506968 -0.581043 4.839481 19.966406 9.908376]; 
 beta_hat = [0.8937, 6.2331, -3.5112, 5.1321, 0.0806, 4.9487, 19.9509, 11.2629];
 std_vec_est = exp(b_mat*beta_hat(1:5)');
 plot(theta_samples, std_vec_est, '.')
