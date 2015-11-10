@@ -1,4 +1,4 @@
-parpool
+parpool(8)
 
 load('data_regr.mat')
 
