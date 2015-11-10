@@ -29,3 +29,5 @@ ub = [Inf Inf Inf Inf Inf 5 Inf Inf];
 [beta_hat, f_min] = nonsta_Matern_fit(negloglik1, beta_init, lb, ub, true);
 
 save('beta_hat.mat', 'beta_hat')
+
+delete(gcp)
