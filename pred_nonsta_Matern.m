@@ -9,55 +9,53 @@ n = 1e3;
 
 % non-stationary variance funcion
 m = 4;
-lambda_inv = 1/1.25;
-b_mat = get_nonsta_var(m, lambda_inv, theta_samples);
+lambda_inv = 2.5;
+b_mat = get_nonsta_var(m, lambda_inv, theta_samples*4);
 
-beta_hat = [3.923432 2.04541 0.396874 1.506968 -0.581043 4.839481 19.966406 9.908376]; 
-beta_hat = [0.8937, 6.2331, -3.5112, 5.1321, 0.0806, 4.9487, 19.9509, 11.2629];
-std_vec_est = exp(b_mat*beta_hat(1:5)');
+beta_hat = [4.698266 1.532569 0.769803 0.832334 -0.860071 4.207303 17.918832 8.156696]; 
+%beta_hat = [3.923432 2.04541 0.396874 1.506968 -0.581043 4.839481 19.966406 9.908376]; 
+%beta_hat = [0.8937, 6.2331, -3.5112, 5.1321, 0.0806, 4.9487, 19.9509, 11.2629];
+std_vec_est = exp(b_mat*reshape(beta_hat(1:m+1), m+1, 1));
 plot(theta_samples, std_vec_est, '.')
 
-r_vec = linspace(0, 2, 1000);
-value = zeros(length(r_vec), 1);
+n_r = 1e3;
+r_vec = linspace(0, 2, n_r);
+value_vec = zeros(n_r, 1);
 nu = beta_hat(6);
 a = beta_hat(7);
-tau = beta_hat(8);
-for i = 1:length(r_vec)
-    value(i) = Matern(r_vec(i), nu, a);
+for i = 1:n_r
+    value_vec(i) = Matern(r_vec(i), nu, a);
 end
+% convert chordal distance to great-circle distance
 r_vec = asin(r_vec/2)*2;
-plot(r_vec, value, 'LineWidth', 2)
+% plot correlation function
+plot(r_vec, value_vec, 'LineWidth', 2)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 theta_vec = theta(:);
 phi_vec = phi(:);
+% stretching
 [x, y, z] = trans_coord(theta_vec*4, phi_vec);
 
-n = length(x);
-r = zeros(n);
-for j = 1:n
-    for i = 1:j
-        s = [x(i); y(i); z(i)];
-        t = [x(j); y(j); z(j)];
-        r(i ,j) = norm(s-t);
-    end
-end
+% total number of locations
+N = length(x);
+
+% get distance matrix
+r = get_chordal_dist(x, y, z);
 
 % non-stationary variance funcion
-m = 4;
-mu = pi/(m+1)*(1:m);
-lambda = pi/(m+1)*2.5/2;
-b_mat = zeros(n, m+1);
-b_mat(:, 1) = 1;
-for i = 2:m+1
-    b_mat(:, i) = exp(-(theta_vec*4-mu(i-1)).^2/2/lambda^2);
-end
+b_mat = get_nonsta_var(m, lambda_inv, theta_vec*4);
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
-cov_mat = get_cov(beta, r, b_mat)+eye(n)*tau^2;
 
+% get cov mat
+cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
+
+% kriging
 Sigma00 = cov_mat(index, index);
-tmp = Sigma00\pot_samples';
+tmp = Sigma00\reshape(pot_samples, n, 1);
 
 SigmaP0 = cov_mat(:, index);
 Y_pred = SigmaP0*tmp;
