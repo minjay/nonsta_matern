@@ -57,3 +57,5 @@ tmp = Sigma00\reshape(pot_samples, n, 1);
 
 SigmaP0 = cov_mat(:, index);
 Y_pred = SigmaP0*tmp;
+
+save('Y_pred.mat', 'Y_pred')
