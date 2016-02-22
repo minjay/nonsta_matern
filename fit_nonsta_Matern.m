@@ -23,8 +23,11 @@ m = 4;
 lambda_inv = 2.5;
 b_mat = get_nonsta_var(m, lambda_inv, theta_samples*4);
 
+% rescale the observations
+Y = pot_samples/1e3;
+
 beta_init = [zeros(1, m+1) 0.5 1 0.1];
-negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r, b_mat, pot_samples);
+negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r, b_mat, Y);
 
 lb = [-Inf -Inf -Inf -Inf -Inf 0 0 0];
 ub = [Inf Inf Inf Inf Inf 5 Inf Inf];
