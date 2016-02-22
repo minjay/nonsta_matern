@@ -5,8 +5,12 @@ rng(1)
 
 % sampling
 n = 1e3;
-[pot_samples, theta_samples, phi_samples, index] = sampling_data(resid,...
-    theta, phi, n, 0);
+theta_vec = theta(:);
+phi_vec = phi(:);
+index = rand_sampler(theta_vec*4, phi_vec);
+theta_samples = theta_vec(index);
+phi_samples = phi_vec(index);
+pot_samples = resid(index)';
 
 % non-stationary variance funcion
 m = 4;
@@ -56,6 +60,6 @@ Sigma00 = cov_mat(index, index);
 tmp = Sigma00\reshape(pot_samples, n, 1);
 
 SigmaP0 = cov_mat(:, index);
-Y_pred = SigmaP0*tmp;
+Y_pred = SigmaP0*tmp*1e3;
 
 save('Y_pred.mat', 'Y_pred')
