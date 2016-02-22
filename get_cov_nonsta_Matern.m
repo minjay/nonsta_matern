@@ -1,5 +1,7 @@
 function cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)
 
+beta
+
 % number of basis functions
 m = size(b_mat, 2)-1;
 eta = beta(1:m+1);
