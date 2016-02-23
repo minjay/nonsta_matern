@@ -57,7 +57,7 @@ cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
 
 % kriging
 Sigma00 = cov_mat(index, index);
-tmp = Sigma00\reshape(pot_samples, n, 1);
+tmp = Sigma00\reshape(pot_samples/1e3, n, 1);
 
 SigmaP0 = cov_mat(:, index);
 Y_pred = SigmaP0*tmp*1e3;
