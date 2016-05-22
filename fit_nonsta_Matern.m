@@ -1,6 +1,6 @@
 parpool(8)
 
-load('data_EOF_regr.mat')
+load('data_EOF_regr_new.mat')
 resid = resid_all(1, :);
 
 rng(1)
@@ -8,10 +8,11 @@ rng(1)
 % sampling
 theta_vec = theta(:);
 phi_vec = phi(:);
-index = rand_sampler_real(theta_vec*4);
+w = sin(theta_vec*4);
+[pot_samples, index] = datasample(resid', 4000, 'Replace', false,...
+    'Weights', w);
 theta_samples = theta_vec(index);
 phi_samples = phi_vec(index);
-pot_samples = resid(index)';
 
 % stretching
 [x, y, z] = trans_coord(theta_samples*4, phi_samples);
@@ -20,8 +21,10 @@ pot_samples = resid(index)';
 r = get_chordal_dist(x, y, z);
 
 % non-stationary variance function
-knots = [0 0 0 0 0.25 0.5 0.75 1 1 1 1]*pi;
+knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
 [b_mat, ~] = bspline_basismatrix(4, knots, theta_samples*4);
+
+b_mat(:, 1) = 1;
 
 m = size(b_mat, 2);
 
