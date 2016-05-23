@@ -1,4 +1,4 @@
-load('data_regr.mat')
+load('data_EOF_regr_new.mat')
 load('beta_hat.mat')
 
 rng(1)
@@ -7,24 +7,28 @@ rng(1)
 n = 1e3;
 theta_vec = theta(:);
 phi_vec = phi(:);
-index = rand_sampler(theta_vec*4, phi_vec);
+w = sin(theta_vec*4);
+[pot_samples, index] = datasample(resid', 4000, 'Replace', false,...
+    'Weights', w);
 theta_samples = theta_vec(index);
 phi_samples = phi_vec(index);
-pot_samples = resid(index)';
 
-% non-stationary variance funcion
-m = 4;
-lambda_inv = 2.5;
-b_mat = get_nonsta_var(m, lambda_inv, theta_samples*4);
+% non-stationary variance function
+knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
+[b_mat, ~] = bspline_basismatrix(4, knots, theta_samples*4);
 
-std_vec_est = exp(b_mat*reshape(beta_hat(1:m+1), m+1, 1));
+b_mat(:, 1) = 1;
+
+m = size(b_mat, 2);
+
+std_vec_est = exp(b_mat*reshape(beta_hat(1:m), m, 1));
 plot(theta_samples, std_vec_est, '.')
 
 n_r = 1e3;
 r_vec = linspace(0, 2, n_r);
 corr_vec = zeros(n_r, 1);
-nu = beta_hat(m+2);
-a = beta_hat(m+3);
+nu = beta_hat(m+1);
+a = beta_hat(m+2);
 for i = 1:n_r
     corr_vec(i) = Matern(r_vec(i), nu, a);
 end
@@ -46,8 +50,9 @@ N = length(x);
 % get distance matrix
 r = get_chordal_dist(x, y, z);
 
-% non-stationary variance funcion
-b_mat = get_nonsta_var(m, lambda_inv, theta_vec*4);
+% non-stationary variance function
+knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
+[b_mat, ~] = bspline_basismatrix(4, knots, theta_vec*4);
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
