@@ -4,11 +4,11 @@ load('beta_hat.mat')
 rng(1)
 
 % sampling
-n = 1e3;
+n = 4*1e3;
 theta_vec = theta(:);
 phi_vec = phi(:);
 w = sin(theta_vec*4);
-[pot_samples, index] = datasample(resid', 4000, 'Replace', false,...
+[pot_samples, index] = datasample(resid', n, 'Replace', false,...
     'Weights', w);
 theta_samples = theta_vec(index);
 phi_samples = phi_vec(index);
