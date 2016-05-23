@@ -31,7 +31,7 @@ m = size(b_mat, 2);
 % rescale the observations
 Y = pot_samples/1e3;
 
-beta_init = [zeros(1, m) 2 10 0.1];
+beta_init = [zeros(1, m) 1 5 0.1];
 negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r, b_mat, Y);
 
 lb = [-Inf(1, m) 0 0 1e-3];
