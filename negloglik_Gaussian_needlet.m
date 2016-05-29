@@ -1,10 +1,12 @@
-function f_value = negloglik_Gaussian_needlet(beta_all, r, b_mat, samples)
+function f_value = negloglik_Gaussian_needlet(beta_all, b_mat, samples, B,...
+    j_min, j_max, theta_samples, phi_samples)
 
 n = length(samples);
 beta = beta_all(1:end-1);
 tau = beta_all(end);
 
-cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(n);
+cov_mat = get_cov_Gaussian_needlet(beta, b_mat, B, j_min, j_max,...
+    theta_samples, phi_samples)+tau^2*eye(n);
 
 [beta tau]
 
