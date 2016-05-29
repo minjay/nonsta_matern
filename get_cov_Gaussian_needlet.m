@@ -1,21 +1,33 @@
-function cov_mat = get_cov_Gaussian_needlet(beta, r, b_mat)
+function cov_mat = get_cov_Gaussian_needlet(beta, b_mat, B, j_min, j_max,...
+    theta_samples, phi_samples)
 
 % number of basis functions
 m = size(b_mat, 2)-1;
 eta = beta(1:m+1);
-nu = beta(m+2);
-a = beta(m+3);
-std_vec = exp(b_mat*reshape(eta, m+1, 1));
-n = length(std_vec);
+std_vec = exp(b_mat*reshape(eta, m+1, 1)); 
+sigma_sq = [1 beta(m+2:end)];
 
-cov_mat = zeros(n);
-for j = 1:n
-    for i = 1:j-1
-        value = nonsta_Matern(std_vec(i), std_vec(j), r(i, j), nu, a);
-        cov_mat(i, j) = value;
-        cov_mat(j, i) = value;
-    end
-    cov_mat(j, j) = nonsta_Matern(std_vec(j), std_vec(j), r(j, j), nu, a);
+[Npix, ~, A] = get_A_ss(B, j_min, j_max, theta_samples*4, phi_samples);
+[N, M] = size(A);
+
+DA = zeros(N, M);
+for i = 1:N
+    DA(i, :) = std_vec(i)*A(i, :);
+end
+
+len_j = length(Npix);
+st = zeros(len_j, 1);
+en = zeros(len_j, 1);
+for j = 1:len_j
+    st(j) = sum(Npix(1:j))-Npix(j)+1;
+    en(j) = sum(Npix(1:j));
+end
+
+cov_mat = zeros(N);
+for j = 1:len_j
+    range = st(j):en(j);
+    DA_sub = DA(:, range);
+    cov_mat = cov_mat+sigma_sq(j)*(DA_sub*DA_sub');
 end
 
 end
