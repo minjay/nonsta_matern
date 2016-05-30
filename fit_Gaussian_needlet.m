@@ -36,8 +36,8 @@ beta_init = [zeros(1, m) 0.1 0.01 0.1];
 negloglik1 = @(beta_all) negloglik_Gaussian_needlet(beta_all, b_mat, Y, B,...
     j_min, j_max, theta_samples, phi_samples);
 
-lb = [-Inf(1, m) 0 0 1e-3];
-ub = [Inf(1, m) 1 1 Inf];
+lb = [-10*ones(1, m) 0 0 1e-3];
+ub = [10*ones(1, m) 1 1 Inf];
 
 [beta_hat, f_min] = Gaussian_needlet_fit(negloglik1, beta_init, lb, ub, true);
 
