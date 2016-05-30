@@ -17,9 +17,6 @@ phi_samples = phi_vec(index);
 % stretching
 [x, y, z] = trans_coord(theta_samples*4, phi_samples);
 
-% get distance matrix
-r = get_chordal_dist(x, y, z);
-
 % non-stationary variance function
 knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
 [b_mat, ~] = bspline_basismatrix(4, knots, theta_samples*4);
@@ -31,14 +28,15 @@ m = size(b_mat, 2);
 % rescale the observations
 Y = pot_samples/1e3;
 
-beta_init = [zeros(1, m) 1 5 0.1];
-negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r, b_mat, Y);
+beta_init = [zeros(1, m) 0.1 0.01 0.1];
+negloglik1 = @(beta_all) negloglik_Gaussian_needlet(beta_all, b_mat, Y, B,...
+    j_min, j_max, theta_samples, phi_samples);
 
 lb = [-Inf(1, m) 0 0 1e-3];
-ub = [Inf(1, m) 5 Inf Inf];
+ub = [Inf(1, m) 1 1 Inf];
 
-[beta_hat, f_min] = nonsta_Matern_fit(negloglik1, beta_init, lb, ub, true);
+[beta_hat, f_min] = Gaussian_needlet_fit(negloglik1, beta_init, lb, ub, true);
 
-save('beta_hat.mat', 'beta_hat')
+save('beta_hat_needlet.mat', 'beta_hat')
 
 delete(gcp)
