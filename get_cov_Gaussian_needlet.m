@@ -1,5 +1,4 @@
-function cov_mat = get_cov_Gaussian_needlet(beta, b_mat, B, j_min, j_max,...
-    theta_samples, phi_samples)
+function cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)
 
 % number of basis functions
 m = size(b_mat, 2)-1;
@@ -7,7 +6,6 @@ eta = beta(1:m+1);
 std_vec = exp(b_mat*reshape(eta, m+1, 1)); 
 sigma_sq = [1 beta(m+2:end)];
 
-[Npix, ~, A] = get_A_ss(B, j_min, j_max, theta_samples*4, phi_samples);
 [N, M] = size(A);
 
 DA = zeros(N, M);
