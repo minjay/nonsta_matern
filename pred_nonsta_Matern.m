@@ -55,6 +55,8 @@ r = get_chordal_dist(x, y, z);
 knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
 [b_mat, ~] = bspline_basismatrix(4, knots, theta_vec*4);
 
+b_mat(:, 1) = 1;
+
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
 
