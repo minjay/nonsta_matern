@@ -32,7 +32,7 @@ B = 2;
 j_min = 2;
 j_max = 4;
 
-beta_init = [zeros(1, m) 0.1 0.01 0.1];
+beta_init = [-1 1 1 1 -1 -1 0.1 0.01 0.1];
 negloglik1 = @(beta_all) negloglik_Gaussian_needlet(beta_all, b_mat, Y, B,...
     j_min, j_max, theta_samples, phi_samples);
 
