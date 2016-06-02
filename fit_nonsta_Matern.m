@@ -3,6 +3,9 @@ parpool(8)
 load('data_EOF_regr_new.mat')
 resid = resid_all(1, :);
 
+load('post_samples_real_new_resid_j24_pen_B_spline_cubic_2knots_aurora_n4000_sigma_j_sq_0.01_0.0002_nu4_long_init0.mat')
+eta_est = mean(post_samples.eta(:, 1501:end), 2);
+
 rng(1)
 
 % sampling
@@ -31,11 +34,11 @@ m = size(b_mat, 2);
 % rescale the observations
 Y = pot_samples/1e3;
 
-beta_init = [zeros(1, m) 1 5 0.1];
+beta_init = [0 eta_est(2:end)' 1 5 0.1];
 negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r, b_mat, Y);
 
-lb = [-Inf(1, m) 0 0 1e-3];
-ub = [Inf(1, m) 5 Inf Inf];
+lb = [-Inf eta_est(2:end)' 0 0 1e-3];
+ub = [Inf eta_est(2:end)' 5 Inf Inf];
 
 [beta_hat, f_min] = nonsta_Matern_fit(negloglik1, beta_init, lb, ub, true);
 
