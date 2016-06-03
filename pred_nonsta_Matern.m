@@ -22,7 +22,7 @@ b_mat(:, 1) = 1;
 
 m = size(b_mat, 2);
 
-std_vec_est = exp(b_mat*reshape(beta_hat(1:m), m, 1));
+std_vec_est = exp(b_mat*reshape(beta_hat(1:m), m, 1))*1e3;
 plot(theta_samples, std_vec_est, '.')
 
 n_r = 1e3;
