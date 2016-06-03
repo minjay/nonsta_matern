@@ -38,7 +38,7 @@ beta_init = [0 eta_est(2:end)' 1 5 0.1];
 negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r, b_mat, Y);
 
 lb = [-Inf eta_est(2:end)' 0 0 1e-3];
-ub = [Inf eta_est(2:end)' 5 Inf Inf];
+ub = [Inf eta_est(2:end)' 10 Inf Inf];
 
 [beta_hat, f_min] = nonsta_Matern_fit(negloglik1, beta_init, lb, ub, true);
 
