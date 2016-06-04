@@ -29,6 +29,7 @@ cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
 figure
 T = 9;
 Y_sim_Matern = mvnrnd(zeros(T, N), cov_mat)*1000;
+rng(1)
 for t = 1:T
     subplot(3, 3, t)
     plot_pot(reshape(Y_sim_Matern(t, :), size(phi)), phi, theta, 1000, max(abs(Y_sim_Matern(t, :))));
