@@ -26,13 +26,14 @@ tau = beta_hat(end);
 % get cov mat
 cov_mat_Matern = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
 
-save('cov_mat_Matern.mat', 'cov_mat_Matern', '-v7.3')
-
 % figure
-% T = 9;
-% Y_sim_Matern = mvnrnd(zeros(T, N), cov_mat)*1000;
-% rng(1)
+T = 9;
+rng(1)
+Y_sim_Matern = mvnrnd(zeros(T, N), cov_mat_Matern)*1000;
+
 % for t = 1:T
 %     subplot(3, 3, t)
 %     plot_pot(reshape(Y_sim_Matern(t, :), size(phi)), phi, theta, 1000, max(abs(Y_sim_Matern(t, :))));
 % end
+
+save('Y_sim_Matern.mat', 'Y_sim_Matern')
