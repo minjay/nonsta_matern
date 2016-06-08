@@ -68,6 +68,8 @@ Sigma00 = cov_mat(index, index);
 tmp = Sigma00\reshape(pot_samples/1e3, n, 1);
 
 SigmaP0 = cov_mat(:, index);
-Y_pred = SigmaP0*tmp*1e3;
+Y_pred_Matern = SigmaP0*tmp*1e3;
 
-save('Y_pred.mat', 'Y_pred')
+Y_err_Matern = resid'-Y_pred_Matern;
+
+save('Y_pred_Matern.mat', 'Y_pred_Matern', 'Y_err_Matern')
