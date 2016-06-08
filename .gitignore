@@ -2,3 +2,7 @@
 Y_pred.mat
 
 Y_sim_Matern.mat
+
+Y_pred_Matern.mat
+
+cov_mat_Matern.mat
