@@ -59,3 +59,5 @@ for t = 1:T
     subplot(3, 3, t)
     plot_pot(reshape(Y_sim_Gau_need(t, :), size(phi)), phi, theta, 1000, max(abs(Y_sim_Gau_need(t, :))));
 end
+
+save('Y_sim_Gau_need.mat', 'Y_sim_Gau_need')
