@@ -24,9 +24,9 @@ beta = beta_hat(1:end-1);
 tau = beta_hat(end);
 
 % get cov mat
-cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
+cov_mat_Matern = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
 
-save('cov_mat_Matern.mat', 'cov_mat')
+save('cov_mat_Matern.mat', 'cov_mat_Matern', '-v7.3')
 
 % figure
 % T = 9;
