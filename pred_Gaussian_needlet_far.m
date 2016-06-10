@@ -41,6 +41,7 @@ n = 4*1e3;
 theta_vec = theta(:);
 phi_vec = phi(:);
 w = sin(theta_vec*4);
+w(phi_vec<=pi/2) = 0;
 [pot_samples, index] = datasample(resid', n, 'Replace', false,...
     'Weights', w);
 
@@ -49,12 +50,12 @@ Sigma00 = cov_mat(index, index);
 tmp = Sigma00\reshape(pot_samples/1e3, n, 1);
 
 SigmaP0 = cov_mat(:, index);
-Y_pred_Gau_need = SigmaP0*tmp*1e3;
+Y_pred_Gau_need_far = SigmaP0*tmp*1e3;
 
 figure
-plot_pot(reshape(Y_pred_Gau_need, size(phi)), phi, theta, 1000, max(abs(Y_pred_Gau_need)))
-Y_err_Gau_need = resid'-Y_pred_Gau_need;
+plot_pot(reshape(Y_pred_Gau_need_far, size(phi)), phi, theta, 1000, max(abs(Y_pred_Gau_need_far)))
+Y_err_Gau_need_far = resid'-Y_pred_Gau_need_far;
 figure
-plot_pot(reshape(Y_err_Gau_need, size(phi)), phi, theta, 1000, max(abs(Y_err_Gau_need)))
+plot_pot(reshape(Y_err_Gau_need_far, size(phi)), phi, theta, 1000, max(abs(Y_err_Gau_need_far)))
 
-save('Y_pred_Gau_need.mat', 'Y_pred_Gau_need', 'Y_err_Gau_need')
+save('Y_pred_Gau_need_far.mat', 'Y_pred_Gau_need_far', 'Y_err_Gau_need_far')
