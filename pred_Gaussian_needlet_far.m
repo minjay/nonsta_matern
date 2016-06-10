@@ -37,13 +37,15 @@ cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)+tau^2*eye(N);
 rng(1)
 
 % sampling
-n = 4*1e3;
+n = 1000;
 theta_vec = theta(:);
 phi_vec = phi(:);
 w = sin(theta_vec*4);
-w(phi_vec<=pi/2) = 0;
+w(phi_vec<=pi/2 & theta_vec<=15/180*pi) = 0;
 [pot_samples, index] = datasample(resid', n, 'Replace', false,...
     'Weights', w);
+theta_samples = theta_vec(index);
+phi_samples = phi_vec(index);
 
 % kriging
 Sigma00 = cov_mat(index, index);
@@ -53,9 +55,12 @@ SigmaP0 = cov_mat(:, index);
 Y_pred_Gau_need_far = SigmaP0*tmp*1e3;
 
 figure
+subplot(1, 2, 1)
 plot_pot(reshape(Y_pred_Gau_need_far, size(phi)), phi, theta, 1000, max(abs(Y_pred_Gau_need_far)))
+colormap(jet)
 Y_err_Gau_need_far = resid'-Y_pred_Gau_need_far;
-figure
-plot_pot(reshape(Y_err_Gau_need_far, size(phi)), phi, theta, 1000, max(abs(Y_err_Gau_need_far)))
+subplot(1, 2, 2)
+plot_pot_with_obs(reshape(Y_err_Gau_need_far, size(phi)), phi, theta, phi_samples, theta_samples, 1000)
+colormap(jet)
 
 save('Y_pred_Gau_need_far.mat', 'Y_pred_Gau_need_far', 'Y_err_Gau_need_far')
