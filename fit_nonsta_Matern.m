@@ -35,7 +35,7 @@ b_mat_full = kron(b_mat, ones(size(theta, 1), 1));
 b_mat = b_mat_full(index, :);
 b_mat = [ones(n, 1) b_mat];
 
-r = size(b_mat, 2);
+r = size(b_mat, 2)-1;
 
 % rescale the observations
 Y = pot_samples/1e3;
