@@ -8,6 +8,7 @@ addpath(genpath('/home/minjay/nonsta_matern'))
 addpath(genpath('/home/minjay/bspline'))
 
 load('data_EOF_regr_new.mat')
+load('post_samples_exp2.mat')
 resid = resid_all(1, :);
 
 rng(1)
@@ -40,7 +41,7 @@ r = size(b_mat, 2)-1;
 % rescale the observations
 Y = pot_samples/1e3;
 
-beta_init = [zeros(1, r+1) 2 10 1e-2];
+beta_init = [beta_hat(1:r+1) 2 10 1e-2];
 negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r_dist, b_mat, Y);
 
 lb = [-10*ones(1, r+1) 0 0 1e-3];
@@ -48,6 +49,6 @@ ub = [10*ones(1, r+1) 10 Inf Inf];
 
 [beta_hat, f_min] = nonsta_Matern_fit(negloglik1, beta_init, lb, ub, true);
 
-save('beta_hat.mat', 'beta_hat')
+save('beta_hat_good_init.mat', 'beta_hat')
 
 delete(gcp)
