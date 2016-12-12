@@ -1,11 +1,12 @@
 load('data_EOF_regr_new.mat')
-load('beta_hat.mat')
+% use new beta_hat from fit_nonsta_Matern_good_init.m
+load('beta_hat_good_init.mat')
 resid = resid_all(1, :);
 
 rng(1)
 
 % sampling
-n = 4*1e3;
+n = 4000;
 theta_vec = theta(:);
 phi_vec = phi(:);
 w = sin(theta_vec*4);
@@ -15,10 +16,11 @@ theta_samples = theta_vec(index);
 phi_samples = phi_vec(index);
 
 % non-stationary variance function
-knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
-[b_mat, ~] = bspline_basismatrix(4, knots, theta_samples*4);
-
-b_mat(:, 1) = 1;
+% the first column is all ones
+load('ns.mat')
+b_mat_full = kron(b_mat, ones(size(theta, 1), 1));
+b_mat = b_mat_full(index, :);
+b_mat = [ones(n, 1) b_mat];
 
 m = size(b_mat, 2);
 
@@ -51,11 +53,7 @@ N = length(x);
 % get distance matrix
 r = get_chordal_dist(x, y, z);
 
-% non-stationary variance function
-knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
-[b_mat, ~] = bspline_basismatrix(4, knots, theta_vec*4);
-
-b_mat(:, 1) = 1;
+b_mat = [ones(N, 1) b_mat_full];
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
