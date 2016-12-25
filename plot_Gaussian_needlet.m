@@ -53,7 +53,9 @@ cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)+tau^2*eye(N);
 
 % figure
 T = 9;
-Y_sim_Gau_need = mvnrnd(zeros(T, N), cov_mat)*1000;
+L = chol(cov_mat, 'lower');
+Z_sim = randn(N, T)*1000;
+Y_sim_Gau_need = (L*Z_sim)';
 % for t = 1:T
 %     subplot(3, 3, t)
 %     plot_pot(reshape(Y_sim_Gau_need(t, :), size(phi)), phi, theta, 1000, max(abs(Y_sim_Gau_need(t, :))));
