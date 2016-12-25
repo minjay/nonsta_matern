@@ -25,7 +25,9 @@ cov_mat_Matern = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
 % figure
 T = 9;
 rng(1)
-Y_sim_Matern = mvnrnd(zeros(T, N), cov_mat_Matern)*1000;
+L = chol(cov_mat_Matern, 'lower');
+Z_sim = randn(N, T)*1000;
+Y_sim_Matern = (L*Z_sim)';
 
 % for t = 1:T
 %     subplot(3, 3, t)
