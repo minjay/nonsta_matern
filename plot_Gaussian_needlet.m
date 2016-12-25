@@ -1,5 +1,5 @@
 load('data_EOF_regr_new.mat')
-load('beta_hat_needlet.mat')
+load('post_samples_exp2.mat')
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
@@ -18,10 +18,10 @@ theta_samples = theta_vec(index);
 phi_samples = phi_vec(index);
 
 % non-stationary variance function
-knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
-[b_mat, ~] = bspline_basismatrix(4, knots, theta_samples*4);
-
-b_mat(:, 1) = 1;
+load('ns.mat')
+b_mat = kron(b_mat, ones(size(theta, 1), 1));
+b_mat = [ones(length(theta_vec), 1) b_mat];
+b_mat = b_mat(index, :);
 
 B = 2;
 j_min = 2;
@@ -44,20 +44,19 @@ A = A(361:N-360, :);
 theta_vec = theta(:);
 
 % non-stationary variance function
-knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
-[b_mat, ~] = bspline_basismatrix(4, knots, theta_vec*4);
-
-b_mat(:, 1) = 1;
+load('ns.mat')
+b_mat = kron(b_mat, ones(size(theta, 1), 1));
+b_mat = [ones(length(theta_vec), 1) b_mat];
 
 % get cov mat
 cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)+tau^2*eye(N);
 
-figure
-T = 9;
-Y_sim_Gau_need = mvnrnd(zeros(T, N), cov_mat)*1000;
-for t = 1:T
-    subplot(3, 3, t)
-    plot_pot(reshape(Y_sim_Gau_need(t, :), size(phi)), phi, theta, 1000, max(abs(Y_sim_Gau_need(t, :))));
-end
+% figure
+% T = 9;
+% Y_sim_Gau_need = mvnrnd(zeros(T, N), cov_mat)*1000;
+% for t = 1:T
+%     subplot(3, 3, t)
+%     plot_pot(reshape(Y_sim_Gau_need(t, :), size(phi)), phi, theta, 1000, max(abs(Y_sim_Gau_need(t, :))));
+% end
 
 save('Y_sim_Gau_need.mat', 'Y_sim_Gau_need')
