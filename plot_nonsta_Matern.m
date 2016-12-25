@@ -1,24 +1,20 @@
 load('data_EOF_regr_new.mat')
-load('beta_hat.mat')
-
-load('mat_A.mat')
-[N, M] = size(A);
-A = A(361:N-360, :);
-[N, M] = size(A);
+load('beta_hat_good_init.mat')
 
 theta_vec = theta(:);
 phi_vec = phi(:);
 % stretching
 [x, y, z] = trans_coord(theta_vec*4, phi_vec);
 
+N = length(x);
+
 % get distance matrix
 r = get_chordal_dist(x, y, z);
 
 % non-stationary variance function
-knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
-[b_mat, ~] = bspline_basismatrix(4, knots, theta_vec*4);
-
-b_mat(:, 1) = 1;
+load('ns.mat')
+b_mat = kron(b_mat, ones(size(theta, 1), 1));
+b_mat = [ones(length(theta_vec), 1) b_mat];
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
