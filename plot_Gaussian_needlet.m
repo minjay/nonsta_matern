@@ -53,6 +53,7 @@ cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)+tau^2*eye(N);
 
 % figure
 T = 9;
+rng(1)
 L = chol(cov_mat, 'lower');
 Z_sim = randn(N, T)*1000;
 Y_sim_Gau_need = (L*Z_sim)';
