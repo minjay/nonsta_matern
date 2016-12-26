@@ -1,15 +1,12 @@
 clear
 
 load('data_EOF_regr_new.mat')
-load('beta_hat_needlet.mat')
+load('post_samples_exp2.mat')
 
 resid = resid_all(1, :);
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
-
-theta_vec = theta(:);
-phi_vec = phi(:);
 
 load('mat_A.mat')
 [N, M] = size(A);
@@ -17,10 +14,9 @@ A = A(361:N-360, :);
 [N, M] = size(A);
 
 % non-stationary variance function
-knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
-[b_mat, ~] = bspline_basismatrix(4, knots, theta_vec*4);
-
-b_mat(:, 1) = 1;
+load('ns.mat')
+b_mat = kron(b_mat, ones(size(theta, 1), 1));
+b_mat = [ones(N, 1) b_mat];
 
 B = 2;
 j_min = 2;
