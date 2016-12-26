@@ -1,5 +1,7 @@
 load('data_EOF_regr_new.mat')
 load('beta_hat_good_init.mat')
+% load standard deviates 
+load('Z_sim_Gau_need.mat')
 
 theta_vec = theta(:);
 phi_vec = phi(:);
@@ -24,9 +26,7 @@ cov_mat_Matern = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
 
 % figure
 T = 9;
-rng(1)
 L = chol(cov_mat_Matern, 'lower');
-Z_sim = randn(N, T)*1000;
 Y_sim_Matern = (L*Z_sim)';
 
 % for t = 1:T
