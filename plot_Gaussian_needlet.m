@@ -1,5 +1,8 @@
+clear
+
 load('data_EOF_regr_new.mat')
 load('post_samples_exp2.mat')
+load('Y_sim_need.mat')
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
@@ -55,11 +58,10 @@ cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)+tau^2*eye(N);
 T = 9;
 rng(1)
 L = chol(cov_mat, 'lower');
-Z_sim = randn(N, T)*1000;
-Y_sim_Gau_need = (L*Z_sim)';
+Z_sim = L\Y_sim_Gau_need';
 % for t = 1:T
 %     subplot(3, 3, t)
 %     plot_pot(reshape(Y_sim_Gau_need(t, :), size(phi)), phi, theta, 1000, max(abs(Y_sim_Gau_need(t, :))));
 % end
 
-save('Y_sim_Gau_need.mat', 'Y_sim_Gau_need')
+save('Z_sim_Gau_need.mat', 'Z_sim')
