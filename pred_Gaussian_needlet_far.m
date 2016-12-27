@@ -1,15 +1,13 @@
 clear
 
 load('data_EOF_regr_new.mat')
-load('beta_hat_needlet.mat')
+load('post_samples_exp2.mat')
+load('post_samples_real_exp3.mat')
 
-resid = resid_all(1, :);
+resid = resid_all(1, :)'/1e3;
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
-
-theta_vec = theta(:);
-phi_vec = phi(:);
 
 load('mat_A.mat')
 [N, M] = size(A);
@@ -17,50 +15,89 @@ A = A(361:N-360, :);
 [N, M] = size(A);
 
 % non-stationary variance function
-knots = [0 0 0 0 40/180 80/180 1 1 1 1]*pi;
-[b_mat, ~] = bspline_basismatrix(4, knots, theta_vec*4);
-
-b_mat(:, 1) = 1;
+load('ns.mat')
+b_mat = kron(b_mat, ones(size(theta, 1), 1));
+b_mat = [ones(N, 1) b_mat];
 
 B = 2;
 j_min = 2;
 j_max = 4;
 
-% get Npix
-[Npix, ~, ~] = get_A_ss(B, j_min, j_max, 0, 0);
-
 % get cov mat
-
 cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)+tau^2*eye(N);
 
-%%% get pot_samples and index
-rng(1)
-
-% sampling
 n = 1000;
 theta_vec = theta(:);
 phi_vec = phi(:);
-w = sin(theta_vec*4);
-w(phi_vec<=pi/2 & theta_vec<=15/180*pi) = 0;
-[pot_samples, index] = datasample(resid', n, 'Replace', false,...
-    'Weights', w);
-theta_samples = theta_vec(index);
-phi_samples = phi_vec(index);
 
-% kriging
-Sigma00 = cov_mat(index, index);
-tmp = Sigma00\reshape(pot_samples/1e3, n, 1);
+% mimic the sampling design of SuperDARN real data
+width = pi/2;
+lat_low = 20/180*pi;
+R = 20;
 
-SigmaP0 = cov_mat(:, index);
-Y_pred_Gau_need_far = SigmaP0*tmp*1e3;
+MSPE_Gau_needlet = zeros(R, 1);
+MAE_Gau_needlet = zeros(R, 1);
+CRPS_Gau_needlet = zeros(R, 1);
+len_90_Gau_needlet = zeros(R, 1);
+len_50_Gau_needlet = zeros(R, 1);
+cp_90_Gau_needlet = zeros(R, 1);
+cp_50_Gau_needlet = zeros(R, 1);
 
-figure
-subplot(1, 2, 1)
-plot_pot(reshape(Y_pred_Gau_need_far, size(phi)), phi, theta, 1000, max(abs(Y_pred_Gau_need_far)))
-colormap(jet)
-Y_err_Gau_need_far = resid'-Y_pred_Gau_need_far;
-subplot(1, 2, 2)
-plot_pot_with_obs(reshape(Y_err_Gau_need_far, size(phi)), phi, theta, phi_samples, theta_samples, 1000)
-colormap(jet)
+% set seed
+rng(1)
 
-save('Y_pred_Gau_need_far.mat', 'Y_pred_Gau_need_far', 'Y_err_Gau_need_far')
+for i = 1:R
+    i
+    
+    % init weight vector w
+    w = sin(theta_vec*4);
+    % set the region of no data
+    w(theta_vec>=lat_low) = 0;
+    st = rand*2*pi;
+    en = st+pi/2;
+    % if part of the interval [st en] is outside of [0, 2*pi)
+    if en>=2*pi
+        w(phi_vec>=st) = 0;
+        w(phi_vec<=en-2*pi) = 0;
+    else
+        w(phi_vec>=st & phi_vec<=en) = 0;
+    end
+        
+    [pot_samples, index] = datasample(resid, n, 'Replace', false,...
+        'Weights', w);
+    theta_samples = theta_vec(index);
+    phi_samples = phi_vec(index);
+
+    % kriging
+    Sigma00 = cov_mat(index, index);
+    tmp = Sigma00\reshape(pot_samples, n, 1);
+
+    index_pred = setdiff(1:N, index);
+    SigmaP0 = cov_mat(:, index);
+    Y_pred_Gau_needlet = SigmaP0*tmp;
+    
+    SigmaPP = cov_mat;
+    Sigma0P = SigmaP0';
+    Var_Y_pred_Gau_needlet = diag(SigmaPP-SigmaP0*(Sigma00\Sigma0P));
+
+    Y_err_Gau_needlet = resid(index_pred)-Y_pred_Gau_needlet(index_pred);
+    
+    % get quantiles
+    Y_lb_90 = Y_pred_Gau_needlet-norminv(0.95)*sqrt(Var_Y_pred_Gau_needlet);
+    Y_ub_90 = Y_pred_Gau_needlet+norminv(0.95)*sqrt(Var_Y_pred_Gau_needlet);
+    Y_lb_50 =  Y_pred_Gau_needlet-norminv(0.75)*sqrt(Var_Y_pred_Gau_needlet);
+    Y_ub_50 = Y_pred_Gau_needlet+norminv(0.75)*sqrt(Var_Y_pred_Gau_needlet);
+    
+    MSPE_Gau_needlet(i) = mean(Y_err_Gau_needlet.^2);
+    MAE_Gau_needlet(i) = mean(abs(Y_err_Gau_needlet));
+    CRPS_Gau_needlet(i) = mean(CRPS(resid(index_pred), Y_pred_Gau_needlet(index_pred),...
+        Var_Y_pred_Gau_needlet(index_pred)));
+    
+    % PI
+    len_90_Gau_needlet(i) = mean(Y_ub_90(index_pred)-Y_lb_90(index_pred));
+    len_50_Gau_needlet(i) = mean(Y_ub_50(index_pred)-Y_lb_50(index_pred));
+    cp_90 = resid>=Y_lb_90 & resid<=Y_ub_90;
+    cp_90_Gau_needlet(i) = mean(cp_90(index_pred));
+    cp_50 = resid>=Y_lb_50 & resid<=Y_ub_50;
+    cp_50_Gau_needlet(i) = mean(cp_50(index_pred));
+end
