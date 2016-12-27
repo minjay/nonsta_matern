@@ -26,6 +26,8 @@ tau = beta_hat(end);
 % get cov mat
 cov_mat_Matern = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(N);
 
+save('cov_mat_Matern.mat', 'cov_mat_Matern')
+
 % figure
 T = 9;
 L = chol(cov_mat_Matern, 'lower');
