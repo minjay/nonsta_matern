@@ -18,6 +18,11 @@ R = 20;
 
 MSPE_Matern = zeros(R, 1);
 MAE_Matern = zeros(R, 1);
+CRPS_Matern = zeros(R, 1);
+len_90_Matern = zeros(R, 1);
+len_50_Matern = zeros(R, 1);
+cp_90_Matern = zeros(R, 1);
+cp_50_Matern = zeros(R, 1);
 
 % set seed
 rng(1)
@@ -58,6 +63,22 @@ for i = 1:R
 
     Y_err_Matern = resid(index_pred)-Y_pred_Matern(index_pred);
     
+    % get quantiles
+    Y_lb_90 = Y_pred_Matern-norminv(0.95)*sqrt(Var_Y_pred_Matern);
+    Y_ub_90 = Y_pred_Matern+norminv(0.95)*sqrt(Var_Y_pred_Matern);
+    Y_lb_50 =  Y_pred_Matern-norminv(0.75)*sqrt(Var_Y_pred_Matern);
+    Y_ub_50 = Y_pred_Matern+norminv(0.75)*sqrt(Var_Y_pred_Matern);
+    
     MSPE_Matern(i) = mean(Y_err_Matern.^2);
     MAE_Matern(i) = mean(abs(Y_err_Matern));
+    CRPS_Matern(i) = mean(CRPS(resid(index_pred), Y_pred_Matern(index_pred),...
+        Var_Y_pred_Matern(index_pred)));
+    
+    % PI
+    len_90_Matern(i) = mean(Y_ub_90(index_pred)-Y_lb_90(index_pred));
+    len_50_Matern(i) = mean(Y_ub_50(index_pred)-Y_lb_50(index_pred));
+    cp_90 = resid>=Y_lb_90 & resid<=Y_ub_90;
+    cp_90_Matern(i) = mean(cp_90(index_pred));
+    cp_50 = resid>=Y_lb_50 & resid<=Y_ub_50;
+    cp_50_Matern(i) = mean(cp_50(index_pred));
 end
