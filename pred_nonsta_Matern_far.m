@@ -1,39 +1,63 @@
 clear
 
 load('data_EOF_regr_new.mat')
-load('beta_hat.mat')
 % load precomputed cov mat
 load('cov_mat_Matern.mat')
-resid = resid_all(1, :);
+% use unit kV
+resid = resid_all(1, :)'/1e3;
 
-rng(1)
-
-% sampling
 n = 1000;
 theta_vec = theta(:);
 phi_vec = phi(:);
-w = sin(theta_vec*4);
-w(phi_vec<=pi/2 & theta_vec<=15/180*pi) = 0;
-[pot_samples, index] = datasample(resid', n, 'Replace', false,...
-    'Weights', w);
-theta_samples = theta_vec(index);
-phi_samples = phi_vec(index);
+N = length(theta_vec);
 
-% kriging
-Sigma00 = cov_mat_Matern(index, index);
-tmp = Sigma00\reshape(pot_samples/1e3, n, 1);
+% mimic the sampling design of SuperDARN real data
+width = pi/2;
+lat_low = 20/180*pi;
+R = 20;
 
-SigmaP0 = cov_mat_Matern(:, index);
-Y_pred_Matern_far = SigmaP0*tmp*1e3;
+MSPE_Matern = zeros(R, 1);
+MAE_Matern = zeros(R, 1);
 
-Y_err_Matern_far = resid'-Y_pred_Matern_far;
+% set seed
+rng(1)
 
-figure
-subplot(1, 2, 1)
-plot_pot(reshape(Y_pred_Matern_far, size(phi)), phi, theta, 1000, max(abs(Y_pred_Matern_far)))
-colormap(jet)
-subplot(1, 2, 2)
-plot_pot_with_obs(reshape(Y_err_Matern_far, size(phi)), phi, theta, phi_samples, theta_samples, 1000)
-colormap(jet)
+for i = 1:R
+    i
+    
+    % init weight vector w
+    w = sin(theta_vec*4);
+    % set the region of no data
+    w(theta_vec>=lat_low) = 0;
+    st = rand*2*pi;
+    en = st+pi/2;
+    % if part of the interval [st en] is outside of [0, 2*pi)
+    if en>=2*pi
+        w(phi_vec>=st) = 0;
+        w(phi_vec<=en-2*pi) = 0;
+    else
+        w(phi_vec>=st & phi_vec<=en) = 0;
+    end
+        
+    [pot_samples, index] = datasample(resid, n, 'Replace', false,...
+        'Weights', w);
+    theta_samples = theta_vec(index);
+    phi_samples = phi_vec(index);
 
-save('Y_pred_Matern_far.mat', 'Y_pred_Matern_far', 'Y_err_Matern_far')
+    % kriging
+    Sigma00 = cov_mat_Matern(index, index);
+    tmp = Sigma00\reshape(pot_samples, n, 1);
+
+    index_pred = setdiff(1:N, index);
+    SigmaP0 = cov_mat_Matern(:, index);
+    Y_pred_Matern = SigmaP0*tmp;
+    
+    SigmaPP = cov_mat_Matern;
+    Sigma0P = SigmaP0';
+    Var_Y_pred_Matern = diag(SigmaPP-SigmaP0*(Sigma00\Sigma0P));
+
+    Y_err_Matern = resid(index_pred)-Y_pred_Matern(index_pred);
+    
+    MSPE_Matern(i) = mean(Y_err_Matern.^2);
+    MAE_Matern(i) = mean(abs(Y_err_Matern));
+end
