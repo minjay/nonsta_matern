@@ -1,5 +1,12 @@
 clear
 
+addpath(genpath('/home/minjay/NeedMat'))
+addpath(genpath('/home/minjay/overcomplete'))
+addpath(genpath('/home/minjay/div_curl'))
+addpath(genpath('/home/minjay/model_output'))
+addpath(genpath('/home/minjay/nonsta_matern'))
+addpath(genpath('/home/minjay/bspline'))
+
 load('data_EOF_regr_new.mat')
 % load precomputed cov mat
 load('cov_mat_Matern.mat')
