@@ -33,7 +33,7 @@ phi_vec = phi(:);
 % mimic the sampling design of SuperDARN real data
 width = pi/2;
 lat_low = 20/180*pi;
-R = 20;
+R = 100;
 
 MSPE_Gau_needlet = zeros(R, 1);
 MAE_Gau_needlet = zeros(R, 1);
@@ -101,3 +101,6 @@ for i = 1:R
     cp_50 = resid>=Y_lb_50 & resid<=Y_ub_50;
     cp_50_Gau_needlet(i) = mean(cp_50(index_pred));
 end
+
+save('pred_Gau_needlet_far.mat', 'MSPE_Gau_needlet', 'MAE_Gau_needlet', 'CRPS_Gau_needlet',...
+    'len_90_Gau_needlet', 'len_50_Gau_needlet', 'cp_90_Gau_needlet', 'cp_50_Gau_needlet')

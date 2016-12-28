@@ -14,7 +14,7 @@ N = length(theta_vec);
 % mimic the sampling design of SuperDARN real data
 width = pi/2;
 lat_low = 20/180*pi;
-R = 20;
+R = 100;
 
 MSPE_Matern = zeros(R, 1);
 MAE_Matern = zeros(R, 1);
@@ -82,3 +82,6 @@ for i = 1:R
     cp_50 = resid>=Y_lb_50 & resid<=Y_ub_50;
     cp_50_Matern(i) = mean(cp_50(index_pred));
 end
+
+save('pred_Matern_far.mat', 'MSPE_Matern', 'MAE_Matern', 'CRPS_Matern',...
+    'len_90_Matern', 'len_50_Matern', 'cp_90_Matern', 'cp_50_Matern')
