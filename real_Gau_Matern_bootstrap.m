@@ -47,7 +47,7 @@ beta_fit_all = zeros(R, length(beta_hat));
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
 
-cov_mat = get_cov_nonsta_Matern(beta, r, b_mat)+tau^2*eye(n);
+cov_mat = get_cov_nonsta_Matern(beta, r_dist, b_mat)+tau^2*eye(n);
 Y = mvnrnd(zeros(1, n), cov_mat, R);
 
 parfor i = 1:R
