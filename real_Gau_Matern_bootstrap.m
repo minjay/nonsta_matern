@@ -50,12 +50,4 @@ tau = beta_hat(end);
 cov_mat = get_cov_nonsta_Matern(beta, r_dist, b_mat)+tau^2*eye(n);
 Y = mvnrnd(zeros(1, n), cov_mat, R);
 
-parfor i = 1:R
-    negloglik1 = @(beta_all) negloglik_nonsta_Matern(beta_all, r_dist, b_mat, Y(i, :));
-    [beta_fit, f_min] = nonsta_Matern_fit(negloglik1, beta_hat, lb, ub, false);
-    beta_fit_all(i, :) = beta_fit;
-end
-
-save('Gau_Matern_bootstrap.mat', 'beta_fit_all', 'beta_hat')
-
-delete(gcp)
+save('Y_Gau_Matern_bootstrap.mat', 'Y', 'r_dist', 'b_mat', 'beta_hat', 'lb', 'ub')
