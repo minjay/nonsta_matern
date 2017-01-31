@@ -11,6 +11,7 @@ for i = 1:length(name)
     end
 end
 
+beta_fit_all_comb(:, 6) = 1./beta_fit_all_comb(:, 6);
 boxplot(beta_fit_all_comb)
 
 est_std = std(beta_fit_all_comb, 0, 1);
