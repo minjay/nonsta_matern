@@ -10,3 +10,5 @@ Y_sim_Gau_need.mat
 Z_sim_Gau_need.mat
 
 Y_pred_Gau_need.mat
+
+Y_Gau_Matern_bootstrap.mat
