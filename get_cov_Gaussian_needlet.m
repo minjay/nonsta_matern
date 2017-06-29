@@ -2,9 +2,9 @@ function cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A)
 
 % number of basis functions
 m = size(b_mat, 2)-1;
-eta = beta(1:m+1);
+eta = [0 beta(1:m)];
 std_vec = exp(b_mat*reshape(eta, m+1, 1)); 
-sigma_sq = [1 beta(m+2:end)];
+sigma_sq = beta(m+1:end);
 
 [N, M] = size(A);
 
