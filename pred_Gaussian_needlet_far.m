@@ -8,8 +8,8 @@ addpath(genpath('/home/minjay/nonsta_matern'))
 addpath(genpath('/home/minjay/bspline'))
 
 load('data_EOF_regr_new.mat')
-load('post_samples_exp2.mat')
 load('post_samples_real_exp3.mat')
+load('post_samples_exp2.mat')
 
 resid = resid_all(1, :)'/1e3;
 
