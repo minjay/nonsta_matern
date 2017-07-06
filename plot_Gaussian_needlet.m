@@ -1,43 +1,17 @@
+addpath(genpath('/home/minjay/NeedMat'))
+addpath(genpath('/home/minjay/overcomplete'))
+addpath(genpath('/home/minjay/div_curl'))
+addpath(genpath('/home/minjay/model_output'))
+addpath(genpath('/home/minjay/nonsta_matern'))
+addpath(genpath('/home/minjay/bspline'))
+
 clear
 
-load('data_EOF_regr_new.mat')
-load('post_samples_exp2.mat')
+load('post_samples_real_reparam_nu4.mat')
 load('Y_sim_need.mat')
 
 beta = beta_hat(1:end-1);
 tau = beta_hat(end);
-
-resid = resid_all(1, :);
-
-rng(1)
-
-% sampling
-theta_vec = theta(:);
-phi_vec = phi(:);
-w = sin(theta_vec*4);
-[pot_samples, index] = datasample(resid', 4000, 'Replace', false,...
-    'Weights', w);
-theta_samples = theta_vec(index);
-phi_samples = phi_vec(index);
-
-% non-stationary variance function
-load('ns.mat')
-b_mat = kron(b_mat, ones(size(theta, 1), 1));
-b_mat = [ones(length(theta_vec), 1) b_mat];
-b_mat = b_mat(index, :);
-
-B = 2;
-j_min = 2;
-j_max = 4;
-
-[Npix, ~, A] = get_A_ss(B, j_min, j_max, theta_samples*4, phi_samples);
-
-cov_mat = get_cov_Gaussian_needlet(beta, b_mat, Npix, A);
-
-figure
-plot(theta_samples, sqrt(diag(cov_mat))*1e3, '.')
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 load('mat_A.mat')
 [N, M] = size(A);
