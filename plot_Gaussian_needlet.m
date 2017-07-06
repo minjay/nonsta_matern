@@ -7,6 +7,7 @@ addpath(genpath('/home/minjay/bspline'))
 
 clear
 
+load('data_EOF_regr_new.mat')
 load('post_samples_real_reparam_nu4.mat')
 load('Y_sim_need.mat')
 
