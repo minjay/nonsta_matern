@@ -20,7 +20,7 @@ N = length(theta_vec);
 
 % mimic the sampling design of SuperDARN real data
 width = pi/2;
-lat_low = 20/180*pi;
+lat_low = 25/180*pi;
 R = 100;
 
 MSPE_Matern = zeros(R, 1);
